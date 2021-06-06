@@ -41,4 +41,5 @@ export default function MyComponent () {
 ## Future features
 
 - Detection of missing react component and suggestion to create with `rotf`
+- Multiple templates (more or less opinionated)
 - Open to feedback 👍
