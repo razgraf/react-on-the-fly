@@ -9,7 +9,7 @@ Create simple React components on the fly. Structure your codebase with placehol
 
 ## Commands
 
-### From the command pallete
+### From the command palette
 
 `Create default component, on the fly` - Based on the default template, configure a placeholder component. 
 
