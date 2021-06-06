@@ -30,7 +30,7 @@ import styled from 'styled-components'
 const Wrapper = styled.div``
 
 export default function MyComponent () {
-  return <Wrapper>Test</Wrapper>
+  return <Wrapper>MyComponent</Wrapper>
 }
 ```
 
