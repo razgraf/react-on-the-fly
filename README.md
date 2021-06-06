@@ -1,10 +1,11 @@
 # React On The Fly
 
-![Screenshot of the platform](images/cover.png)
+![Cover React On The Fly](images/cover.png)
 
 ## Overview
 Create simple React components on the fly. Structure your codebase with placeholders and focus on the overall functionality, rather than leaving the window to copy and paste boilerplate.
 
+![Demo React On The Fly](images/react-on-the-fly-fast.gif)
 
 ## Commands
 

@@ -56,22 +56,31 @@ export async function getSelectedDirectory(
 export async function getDesiredName(
   directory: string
 ): Promise<string | undefined> {
-  const inputBox = await vscode.window.showInputBox({
-    title: "What is the name of your new component?",
-    placeHolder: "Component",
-    prompt: `Create component in ${directory}`,
-  });
-  if (inputBox === undefined || inputBox.length === 0) {
-    vscode.window.showErrorMessage(
-      "react-on-the-fly: You need to pick a name for your new <Component/>"
-    );
-    return undefined;
+  let name = undefined;
+
+  const editor = vscode.window.activeTextEditor;
+  if (editor && editor.selection) {
+    const document = editor.document;
+    const selection = editor.selection;
+    name = document.getText(selection);
+  }
+  if (name === undefined || name.length === 0) {
+    const inputBox = await vscode.window.showInputBox({
+      title: "What is the name of your new component?",
+      placeHolder: "Component",
+      prompt: `Create component in ${directory}`,
+    });
+    if (inputBox === undefined || inputBox.length === 0) {
+      vscode.window.showErrorMessage(
+        "react-on-the-fly: You need to pick a name for your new <Component/>"
+      );
+      return undefined;
+    }
+
+    name = inputBox;
   }
 
-  return (inputBox.charAt(0).toUpperCase() + inputBox.slice(1)).replace(
-    " ",
-    ""
-  );
+  return (name.charAt(0).toUpperCase() + name.slice(1)).replace(" ", "");
 }
 
 export async function doPasteImport(name: string) {

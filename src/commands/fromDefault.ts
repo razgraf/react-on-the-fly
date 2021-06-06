@@ -1,8 +1,9 @@
 import * as vscode from "vscode";
-import * as path from "path";
 import * as fs from "fs";
 import * as constants from "../constants";
 import handlebars from "handlebars";
+
+import defaultTemplate from "../templates/component.json";
 
 import {
   doCreateDirectory,
@@ -14,12 +15,8 @@ import {
 } from "../utils";
 
 function doWriteTemplate(stream: fs.WriteStream, name: string): void {
-  const raw = fs.readFileSync(
-    path.resolve(__dirname, "../templates/component.json"),
-    "utf8"
-  );
+  const template = defaultTemplate;
 
-  const template = JSON.parse(raw);
   const engine = handlebars.compile(template.source);
   const binded = engine({ name });
 
@@ -51,6 +48,7 @@ async function create(
       );
       return;
     }
+
     doWriteTemplate(componentFileStream, name);
 
     vscode.window.showInformationMessage(
