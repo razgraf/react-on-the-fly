@@ -7,9 +7,11 @@ import handlebars from "handlebars";
 import {
   doCreateDirectory,
   doCreateFile,
-  isFilePathInWorkspace,
+  getSelectedDirectory,
+  getDesiredName,
+  doPasteImport,
+  getActiveFileDirectory,
 } from "../utils";
-import { getSelectedDirectory, getDesiredName } from "./shared";
 
 function doWriteTemplate(stream: fs.WriteStream, name: string): void {
   if (
@@ -98,42 +100,56 @@ function doWriteTemplate(stream: fs.WriteStream, name: string): void {
   stream.close();
 }
 
-function fromTemplate(): vscode.Disposable {
+async function create(context): Promise<string | undefined> {
+  const dir = await getSelectedDirectory(context);
+  if (!dir) {
+    return;
+  }
+  const name = await getDesiredName(dir.fsPath);
+  if (dir && name) {
+    const componentDirectory = doCreateDirectory(dir, name);
+    if (!componentDirectory) {
+      vscode.window.showErrorMessage(
+        `Error encountered when creating the "${name}" directory. Check if a directory with the same name is not already there. [react-on-the-fly]`
+      );
+      return;
+    }
+
+    const componentFileStream = doCreateFile(componentDirectory, "index.js");
+    if (!componentFileStream) {
+      vscode.window.showErrorMessage(
+        `Error encountered when creating the "${name}" file. Check if the component directory is not already created. [react-on-the-fly]`
+      );
+      return;
+    }
+    doWriteTemplate(componentFileStream, name);
+
+    vscode.window.showInformationMessage(
+      `react-on-the-fly: ${name} component created in ${dir?.fsPath}`
+    );
+
+    return name;
+  }
+}
+
+export function fromTemplate(): vscode.Disposable {
   return vscode.commands.registerCommand(
     `${constants.project}.${constants.commands.fromTemplate}`,
-    async () => {
-      const dir = await getSelectedDirectory();
-      if (!dir) {
-        return;
-      }
-      const name = await getDesiredName(dir.fsPath);
-      if (dir && name) {
-        const componentDirectory = doCreateDirectory(dir, name);
-        if (!componentDirectory) {
-          vscode.window.showErrorMessage(
-            `Error encountered when creating the "${name}" directory. Check if a directory with the same name is not already there. [react-on-the-fly]`
-          );
-          return;
-        }
-
-        const componentFileStream = doCreateFile(
-          componentDirectory,
-          "index.js"
-        );
-        if (!componentFileStream) {
-          vscode.window.showErrorMessage(
-            `Error encountered when creating the "${name}" file. Check if the component directory is not already created. [react-on-the-fly]`
-          );
-          return;
-        }
-        doWriteTemplate(componentFileStream, name);
-
-        vscode.window.showInformationMessage(
-          `react-on-the-fly: ${name} component created in ${dir?.fsPath}`
-        );
-      }
+    async (context) => {
+      await create(context);
     }
   );
 }
 
-export default fromTemplate;
+export function fromTemplateWithImport(): vscode.Disposable {
+  return vscode.commands.registerCommand(
+    `${constants.project}.${constants.commands.fromTemplateWithImport}`,
+    async () => {
+      const context = getActiveFileDirectory();
+      const name = await create(context);
+      if (name) {
+        await doPasteImport(name);
+      }
+    }
+  );
+}

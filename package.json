@@ -11,20 +11,54 @@
 	],
 	"activationEvents": [
 		"onCommand:react-on-the-fly.rotft",
-		"onCommand:react-on-the-fly.rotfd"
+		"onCommand:react-on-the-fly.rotfd",
+		"onCommand:react-on-the-fly.rotfdi",
+		"onCommand:react-on-the-fly.rotfti"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "react-on-the-fly.rotft",
-				"title": "React On The Fly: Create component using your template"
+				"command": "react-on-the-fly.rotfd",
+				"title": "Create default component, on the fly"
 			},
 			{
-				"command": "react-on-the-fly.rotfd",
-				"title": "React On The Fly: Create default component"
+				"command": "react-on-the-fly.rotft",
+				"title": "Create component using your template, on the fly"
+			},
+			{
+				"command": "react-on-the-fly.rotfdi",
+				"title": "Create and import default component, on the fly",
+				"when": "editorFocus == true"
+			},
+			{
+				"command": "react-on-the-fly.rotfti",
+				"title": "Create and import component using your template, on the fly",
+				"when": "editorFocus == true"
 			}
-		]
+		],
+		"menus": {
+			"explorer/context": [
+				{
+					"command": "react-on-the-fly.rotfd",
+					"group": "react-on-the-fly@1"
+				},
+				{
+					"command": "react-on-the-fly.rotft",
+					"group": "react-on-the-fly@2"
+				}
+			],
+			"editor/context": [
+				{
+					"command": "react-on-the-fly.rotfdi",
+					"group": "react-on-the-fly@1"
+				},
+				{
+					"command": "react-on-the-fly.rotfti",
+					"group": "react-on-the-fly@2"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "yarn run compile",

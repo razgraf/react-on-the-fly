@@ -1,9 +1,20 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 
-import { isFilePathInWorkspace, getNormalizedDirectory } from "../utils";
+import ImportPosition from "./position";
+import { isFilePathInWorkspace, getNormalizedDirectory } from "./system";
 
-export async function getSelectedDirectory(): Promise<vscode.Uri | undefined> {
+export async function getSelectedDirectory(
+  context: vscode.Uri | undefined
+): Promise<vscode.Uri | undefined> {
+  /**
+   * Step 0: If the directory comes from the context menu as an argument, use that
+   */
+
+  if (context && context.fsPath) {
+    return context;
+  }
+
   /**
    * Step 1: try to get the selected folder from the file menu tree
    * Workaround as per https://github.com/Microsoft/vscode/issues/3553#issuecomment-757560862
@@ -61,4 +72,26 @@ export async function getDesiredName(
     " ",
     ""
   );
+}
+
+export async function doPasteImport(name: string) {
+  await vscode.commands.executeCommand("notifications.clearAll");
+  const editor = vscode.window.activeTextEditor;
+
+  if (!editor) {
+    vscode.window.showErrorMessage(
+      "react-on-the-fly: Missing an active editor. Please open a file and call this command again."
+    );
+    return undefined;
+  }
+
+  /**
+   * Implementation as per: https://github1s.com/ElecTreeFrying/auto-import-relative-path
+   */
+
+  const importPosition = new ImportPosition(
+    editor,
+    `import ${name} from "./${name}"\n`
+  );
+  importPosition.pasteImport();
 }

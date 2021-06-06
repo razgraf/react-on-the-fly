@@ -9,13 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.fromDefaultWithImport = exports.fromDefault = void 0;
 const vscode = require("vscode");
 const path = require("path");
 const fs = require("fs");
 const constants = require("../constants");
 const handlebars_1 = require("handlebars");
 const utils_1 = require("../utils");
-const shared_1 = require("./shared");
 function doWriteTemplate(stream, name) {
     const raw = fs.readFileSync(path.resolve(__dirname, "../templates/component.json"), "utf8");
     const template = JSON.parse(raw);
@@ -24,13 +24,13 @@ function doWriteTemplate(stream, name) {
     stream.write(binded);
     stream.close();
 }
-function fromDefault() {
-    return vscode.commands.registerCommand(`${constants.project}.${constants.commands.fromDefault}`, () => __awaiter(this, void 0, void 0, function* () {
-        const dir = yield shared_1.getSelectedDirectory();
+function create(context) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const dir = yield utils_1.getSelectedDirectory(context);
         if (!dir) {
             return;
         }
-        const name = yield shared_1.getDesiredName(dir.fsPath);
+        const name = yield utils_1.getDesiredName(dir.fsPath);
         if (dir && name) {
             const componentDirectory = utils_1.doCreateDirectory(dir, name);
             if (!componentDirectory) {
@@ -43,9 +43,25 @@ function fromDefault() {
                 return;
             }
             doWriteTemplate(componentFileStream, name);
-            vscode.window.showInformationMessage(`react-on-the-fly: ${name} component created in ${dir === null || dir === void 0 ? void 0 : dir.fsPath}`);
+            vscode.window.showInformationMessage(`react-on-the-fly: ${name} component created in ${dir.fsPath}`);
+            return name;
+        }
+    });
+}
+function fromDefault() {
+    return vscode.commands.registerCommand(`${constants.project}.${constants.commands.fromDefault}`, (context) => __awaiter(this, void 0, void 0, function* () {
+        yield create(context);
+    }));
+}
+exports.fromDefault = fromDefault;
+function fromDefaultWithImport() {
+    return vscode.commands.registerCommand(`${constants.project}.${constants.commands.fromDefaultWithImport}`, () => __awaiter(this, void 0, void 0, function* () {
+        const context = utils_1.getActiveFileDirectory();
+        const name = yield create(context);
+        if (name) {
+            yield utils_1.doPasteImport(name);
         }
     }));
 }
-exports.default = fromDefault;
+exports.fromDefaultWithImport = fromDefaultWithImport;
 //# sourceMappingURL=fromDefault.js.map
