@@ -2,47 +2,29 @@ import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
 import * as constants from "../constants";
-
-async function getNormalizedDirectory(
-  source: string
-): Promise<vscode.Uri | undefined> {
-  const exists = fs.existsSync(source);
-  if (exists) {
-    const stat = fs.statSync(source);
-    if (stat.isDirectory()) {
-      return vscode.Uri.parse(source);
-    } else if (stat.isFile()) {
-      const directory = path.dirname(source);
-      return vscode.Uri.parse(directory);
-    }
-  }
-  return undefined;
-}
-
-async function getActiveFileDirectory(): Promise<vscode.Uri | undefined> {
-  if (vscode.window.activeTextEditor) {
-    const file = vscode.window.activeTextEditor.document.uri;
-    const directory = path.dirname(file.fsPath);
-    return vscode.Uri.parse(directory);
-  }
-
-  return undefined;
-}
+import {
+  isFilePathInWorkspace,
+  getNormalizedDirectory,
+  doCreateDirectory,
+} from "../utils";
 
 async function getSelectedDirectory(): Promise<vscode.Uri | undefined> {
-  /** Step 1: try to get the selected folder from the file menu tree
-   *  Workaround as per https://github.com/Microsoft/vscode/issues/3553#issuecomment-757560862
+  /**
+   * Step 1: try to get the selected folder from the file menu tree
+   * Workaround as per https://github.com/Microsoft/vscode/issues/3553#issuecomment-757560862
    */
   await vscode.commands.executeCommand("copyFilePath");
   let directory = await vscode.env.clipboard.readText();
-  try {
-    if (directory.includes("\n")) {
-      directory = directory.split("\n")[0];
-    }
-    return getNormalizedDirectory(directory);
-  } catch (e) {
-    console.error(e);
+
+  if (directory.includes("\n")) {
+    directory = directory.split("\n")[0];
   }
+  const exists = fs.existsSync(directory);
+  if (exists && isFilePathInWorkspace(directory)) {
+    return getNormalizedDirectory(directory);
+  }
+
+  directory = undefined;
 
   /**
    * Step 2: If step 1 doesn't yield any usable directory, use the base workspace directory
@@ -65,12 +47,36 @@ async function getSelectedDirectory(): Promise<vscode.Uri | undefined> {
   return undefined;
 }
 
+async function getDesiredName(directory: string): Promise<string | undefined> {
+  const inputBox = await vscode.window.showInputBox({
+    title: "What is the name of your new component?",
+    placeHolder: "Component",
+    prompt: `Create component in ${directory}`,
+  });
+  if (inputBox === undefined || inputBox.length === 0) {
+    vscode.window.showErrorMessage(
+      "react-on-the-fly: You need to pick a name for your new <Component/>"
+    );
+    return undefined;
+  }
+  return inputBox.charAt(0).toUpperCase() + inputBox.slice(1);
+}
+
 function otfc(): vscode.Disposable {
   return vscode.commands.registerCommand(
     `${constants.project}.${constants.commands.otfc}`,
     async () => {
       const dir = await getSelectedDirectory();
-      vscode.window.showInformationMessage(`CWD: ${dir?.fsPath}`);
+      if (!dir) {
+        return;
+      }
+      const name = await getDesiredName(dir.fsPath);
+      if (dir && name) {
+        doCreateDirectory(dir, name);
+        vscode.window.showInformationMessage(
+          `react-on-the-fly: ${dir?.fsPath}, ${name}`
+        );
+      }
     }
   );
 }

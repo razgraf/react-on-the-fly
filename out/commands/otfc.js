@@ -10,52 +10,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const vscode = require("vscode");
-const path = require("path");
 const fs = require("fs");
 const constants = require("../constants");
-function getNormalizedDirectory(source) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const exists = fs.existsSync(source);
-        if (exists) {
-            const stat = fs.statSync(source);
-            if (stat.isDirectory()) {
-                return vscode.Uri.parse(source);
-            }
-            else if (stat.isFile()) {
-                const directory = path.dirname(source);
-                return vscode.Uri.parse(directory);
-            }
-        }
-        return undefined;
-    });
-}
-function getActiveFileDirectory() {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (vscode.window.activeTextEditor) {
-            const file = vscode.window.activeTextEditor.document.uri;
-            const directory = path.dirname(file.fsPath);
-            return vscode.Uri.parse(directory);
-        }
-        return undefined;
-    });
-}
+const utils_1 = require("../utils");
 function getSelectedDirectory() {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        /** Step 1: try to get the selected folder from the file menu tree
-         *  Workaround as per https://github.com/Microsoft/vscode/issues/3553#issuecomment-757560862
+        /**
+         * Step 1: try to get the selected folder from the file menu tree
+         * Workaround as per https://github.com/Microsoft/vscode/issues/3553#issuecomment-757560862
          */
         yield vscode.commands.executeCommand("copyFilePath");
         let directory = yield vscode.env.clipboard.readText();
-        try {
-            if (directory.includes("\n")) {
-                directory = directory.split("\n")[0];
-            }
-            return getNormalizedDirectory(directory);
+        if (directory.includes("\n")) {
+            directory = directory.split("\n")[0];
         }
-        catch (e) {
-            console.error(e);
+        const exists = fs.existsSync(directory);
+        if (exists && utils_1.isFilePathInWorkspace(directory)) {
+            return utils_1.getNormalizedDirectory(directory);
         }
+        directory = undefined;
         /**
          * Step 2: If step 1 doesn't yield any usable directory, use the base workspace directory
          * Implementation as per: https://github1s.com/fayras/vscode-simple-new-file/
@@ -76,10 +50,31 @@ function getSelectedDirectory() {
         return undefined;
     });
 }
+function getDesiredName(directory) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const inputBox = yield vscode.window.showInputBox({
+            title: "What is the name of your new component?",
+            placeHolder: "Component",
+            prompt: `Create component in ${directory}`,
+        });
+        if (inputBox === undefined || inputBox.length === 0) {
+            vscode.window.showErrorMessage("react-on-the-fly: You need to pick a name for your new <Component/>");
+            return undefined;
+        }
+        return inputBox.charAt(0).toUpperCase() + inputBox.slice(1);
+    });
+}
 function otfc() {
     return vscode.commands.registerCommand(`${constants.project}.${constants.commands.otfc}`, () => __awaiter(this, void 0, void 0, function* () {
         const dir = yield getSelectedDirectory();
-        vscode.window.showInformationMessage(`CWD: ${dir === null || dir === void 0 ? void 0 : dir.fsPath}`);
+        if (!dir) {
+            return;
+        }
+        const name = yield getDesiredName(dir.fsPath);
+        if (dir && name) {
+            utils_1.doCreateDirectory(dir, name);
+            vscode.window.showInformationMessage(`react-on-the-fly: ${dir === null || dir === void 0 ? void 0 : dir.fsPath}, ${name}`);
+        }
     }));
 }
 exports.default = otfc;
