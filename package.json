@@ -2,7 +2,7 @@
 	"name": "react-on-the-fly",
 	"displayName": "React On The Fly",
 	"description": "Turn boilerplate into a new component and auto-import it on the fly in React.",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"publisher": "razgraf",
 	"repository": {
 		"type": "git",
