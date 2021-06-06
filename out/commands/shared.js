@@ -9,11 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getDesiredName = exports.getSelectedDirectory = void 0;
 const vscode = require("vscode");
-const path = require("path");
 const fs = require("fs");
-const constants = require("../constants");
-const handlebars_1 = require("handlebars");
 const utils_1 = require("../utils");
 function getSelectedDirectory() {
     var _a;
@@ -52,6 +50,7 @@ function getSelectedDirectory() {
         return undefined;
     });
 }
+exports.getSelectedDirectory = getSelectedDirectory;
 function getDesiredName(directory) {
     return __awaiter(this, void 0, void 0, function* () {
         const inputBox = yield vscode.window.showInputBox({
@@ -66,36 +65,5 @@ function getDesiredName(directory) {
         return (inputBox.charAt(0).toUpperCase() + inputBox.slice(1)).replace(" ", "");
     });
 }
-function doWriteTemplate(stream, name) {
-    const raw = fs.readFileSync(path.resolve(__dirname, "../templates/component.json"), "utf8");
-    const template = JSON.parse(raw);
-    const engine = handlebars_1.default.compile(template.source);
-    const binded = engine({ name });
-    stream.write(binded);
-    stream.close();
-}
-function otfc() {
-    return vscode.commands.registerCommand(`${constants.project}.${constants.commands.otfc}`, () => __awaiter(this, void 0, void 0, function* () {
-        const dir = yield getSelectedDirectory();
-        if (!dir) {
-            return;
-        }
-        const name = yield getDesiredName(dir.fsPath);
-        if (dir && name) {
-            const componentDirectory = utils_1.doCreateDirectory(dir, name);
-            if (!componentDirectory) {
-                vscode.window.showErrorMessage(`Error encountered when creating the "${name}" directory. Check if a directory with the same name is not already there. [react-on-the-fly]`);
-                return;
-            }
-            const componentFileStream = utils_1.doCreateIndexFile(componentDirectory);
-            if (!componentFileStream) {
-                vscode.window.showErrorMessage(`Error encountered when creating the "${name}" file. Check if the component directory is not already created. [react-on-the-fly]`);
-                return;
-            }
-            doWriteTemplate(componentFileStream, name);
-            vscode.window.showInformationMessage(`react-on-the-fly: ${name} component created in ${dir === null || dir === void 0 ? void 0 : dir.fsPath}`);
-        }
-    }));
-}
-exports.default = otfc;
-//# sourceMappingURL=otfc.js.map
+exports.getDesiredName = getDesiredName;
+//# sourceMappingURL=shared.js.map

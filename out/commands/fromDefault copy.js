@@ -98,4 +98,4 @@ function otfc() {
     }));
 }
 exports.default = otfc;
-//# sourceMappingURL=otfc.js.map
+//# sourceMappingURL=fromDefault%20copy.js.map

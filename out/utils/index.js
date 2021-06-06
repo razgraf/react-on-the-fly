@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getActiveFileDirectory = exports.doCreateDirectory = exports.getNormalizedDirectory = exports.isFilePathInWorkspace = void 0;
+exports.getActiveFileDirectory = exports.doCreateFile = exports.doCreateDirectory = exports.getNormalizedDirectory = exports.isFilePathInWorkspace = void 0;
 const vscode = require("vscode");
 const path = require("path");
 const fs = require("fs");
@@ -25,6 +25,9 @@ function getNormalizedDirectory(source) {
 }
 exports.getNormalizedDirectory = getNormalizedDirectory;
 function doCreateDirectory(base, name) {
+    if (base === undefined || name === undefined || name.length === 0) {
+        return undefined;
+    }
     const location = path.join(base.fsPath, name);
     /** Step 1: check if the base is indeed available and a directory */
     if (!fs.existsSync(base.fsPath)) {
@@ -41,9 +44,31 @@ function doCreateDirectory(base, name) {
         return undefined;
     }
     fs.mkdirSync(location);
-    vscode.Uri.parse(location);
+    return vscode.Uri.parse(location);
 }
 exports.doCreateDirectory = doCreateDirectory;
+function doCreateFile(base, name) {
+    if (base === undefined) {
+        return undefined;
+    }
+    const location = path.join(base.fsPath, name);
+    /** Step 1: check if the base is indeed available and a directory */
+    if (!fs.existsSync(base.fsPath)) {
+        return undefined;
+    }
+    else {
+        const stat = fs.statSync(base.fsPath);
+        if (!stat.isDirectory()) {
+            return undefined;
+        }
+    }
+    /** Step 1: check if the new file is not already created */
+    if (fs.existsSync(location)) {
+        return undefined;
+    }
+    return fs.createWriteStream(location);
+}
+exports.doCreateFile = doCreateFile;
 function getActiveFileDirectory() {
     if (vscode.window.activeTextEditor) {
         const file = vscode.window.activeTextEditor.document.uri;

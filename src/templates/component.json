@@ -1,0 +1,3 @@
+{
+    "source": "import React from 'react'\nimport styled from 'styled-components'\nconst Wrapper = styled.div``\n\nexport default function {{name}} () {\n  return <Wrapper>{{name}}</Wrapper>\n}"
+}

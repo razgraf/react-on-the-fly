@@ -1,14 +1,9 @@
 import * as vscode from "vscode";
-import * as path from "path";
 import * as fs from "fs";
-import * as constants from "../constants";
-import {
-  isFilePathInWorkspace,
-  getNormalizedDirectory,
-  doCreateDirectory,
-} from "../utils";
 
-async function getSelectedDirectory(): Promise<vscode.Uri | undefined> {
+import { isFilePathInWorkspace, getNormalizedDirectory } from "../utils";
+
+export async function getSelectedDirectory(): Promise<vscode.Uri | undefined> {
   /**
    * Step 1: try to get the selected folder from the file menu tree
    * Workaround as per https://github.com/Microsoft/vscode/issues/3553#issuecomment-757560862
@@ -47,7 +42,9 @@ async function getSelectedDirectory(): Promise<vscode.Uri | undefined> {
   return undefined;
 }
 
-async function getDesiredName(directory: string): Promise<string | undefined> {
+export async function getDesiredName(
+  directory: string
+): Promise<string | undefined> {
   const inputBox = await vscode.window.showInputBox({
     title: "What is the name of your new component?",
     placeHolder: "Component",
@@ -59,26 +56,9 @@ async function getDesiredName(directory: string): Promise<string | undefined> {
     );
     return undefined;
   }
-  return inputBox.charAt(0).toUpperCase() + inputBox.slice(1);
-}
 
-function otfc(): vscode.Disposable {
-  return vscode.commands.registerCommand(
-    `${constants.project}.${constants.commands.otfc}`,
-    async () => {
-      const dir = await getSelectedDirectory();
-      if (!dir) {
-        return;
-      }
-      const name = await getDesiredName(dir.fsPath);
-      if (dir && name) {
-        doCreateDirectory(dir, name);
-        vscode.window.showInformationMessage(
-          `react-on-the-fly: ${dir?.fsPath}, ${name}`
-        );
-      }
-    }
+  return (inputBox.charAt(0).toUpperCase() + inputBox.slice(1)).replace(
+    " ",
+    ""
   );
 }
-
-export default otfc;

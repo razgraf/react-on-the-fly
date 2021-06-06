@@ -10,21 +10,31 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:react-on-the-fly.hello",
-		"onCommand:react-on-the-fly.otfc"
+		"onCommand:react-on-the-fly.rotft",
+		"onCommand:react-on-the-fly.rotfd"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "react-on-the-fly.hello",
-				"title": "hello"
+				"command": "react-on-the-fly.rotft",
+				"title": "React On The Fly: Create component using your template"
 			},
 			{
-				"command": "react-on-the-fly.otfc",
-				"title": "On the fly component (opinionated)"
+				"command": "react-on-the-fly.rotfd",
+				"title": "React On The Fly: Create default component"
 			}
-		]
+		],
+		"configuration": {
+			"title": "React On The Fly",
+			"properties": {
+				"react-on-the-fly.userTemplateLocationInWorkspace": {
+					"type": "string",
+					"default": ".rotf/component.handlebars",
+					"description": "Specify the file path of the customized component template. Make sure it is a .handlebars or .hbs file that consumes a 'title' variable."
+				}
+			}
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "yarn run compile",

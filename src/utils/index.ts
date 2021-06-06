@@ -25,6 +25,9 @@ export function doCreateDirectory(
   base: vscode.Uri,
   name: string
 ): vscode.Uri | undefined {
+  if (base === undefined || name === undefined || name.length === 0) {
+    return undefined;
+  }
   const location = path.join(base.fsPath, name);
   /** Step 1: check if the base is indeed available and a directory */
   if (!fs.existsSync(base.fsPath)) {
@@ -41,7 +44,32 @@ export function doCreateDirectory(
   }
 
   fs.mkdirSync(location);
-  vscode.Uri.parse(location);
+  return vscode.Uri.parse(location);
+}
+
+export function doCreateFile(
+  base: vscode.Uri,
+  name: string
+): fs.WriteStream | undefined {
+  if (base === undefined) {
+    return undefined;
+  }
+  const location = path.join(base.fsPath, name);
+  /** Step 1: check if the base is indeed available and a directory */
+  if (!fs.existsSync(base.fsPath)) {
+    return undefined;
+  } else {
+    const stat = fs.statSync(base.fsPath);
+    if (!stat.isDirectory()) {
+      return undefined;
+    }
+  }
+  /** Step 1: check if the new file is not already created */
+  if (fs.existsSync(location)) {
+    return undefined;
+  }
+
+  return fs.createWriteStream(location);
 }
 
 export function getActiveFileDirectory(): vscode.Uri | undefined {

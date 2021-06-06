@@ -1,5 +1,11 @@
 export const project = "react-on-the-fly";
 export const commands: { [key: string]: string } = {
-  hello: "hello",
-  otfc: "otfc",
+  fromTemplate: "rotft",
+  fromDefault: "rotfd",
+};
+
+export const configuration: { [key: string]: string } = {
+  directory: ".react-on-the-fly",
+  file: "template",
+  path: ".react-on-the-fly/template",
 };
