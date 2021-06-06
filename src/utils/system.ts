@@ -2,7 +2,14 @@ import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
 
-export function isFilePathInWorkspace(file: string) {
+export function isFilePathInWorkspace(file: string): boolean {
+  if (
+    !vscode.workspace ||
+    !vscode.workspace.workspaceFolders ||
+    !vscode.workspace.workspaceFolders.length
+  ) {
+    return false;
+  }
   const workspace = vscode.workspace.workspaceFolders[0].uri.fsPath;
   return file.startsWith(workspace);
 }

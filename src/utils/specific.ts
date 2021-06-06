@@ -20,7 +20,7 @@ export async function getSelectedDirectory(
    * Workaround as per https://github.com/Microsoft/vscode/issues/3553#issuecomment-757560862
    */
   await vscode.commands.executeCommand("copyFilePath");
-  let directory = await vscode.env.clipboard.readText();
+  let directory: string | undefined = await vscode.env.clipboard.readText();
 
   if (directory.includes("\n")) {
     directory = directory.split("\n")[0];

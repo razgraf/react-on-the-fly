@@ -3,6 +3,11 @@
 	"displayName": "React On The Fly",
 	"description": "Turn boilerplate into a new component and auto-import it on the fly in React.",
 	"version": "0.0.1",
+	"publisher": "razgraf",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/razgraf/react-on-the-fly"
+	},
 	"engines": {
 		"vscode": "^1.56.0"
 	},
@@ -65,8 +70,7 @@
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
 		"pretest": "yarn run compile && yarn run lint",
-		"lint": "eslint src --ext ts",
-		"test": "node ./out/test/runTest.js"
+		"lint": "eslint src --ext ts"
 	},
 	"devDependencies": {
 		"@types/glob": "^7.1.3",
@@ -78,8 +82,7 @@
 		"eslint": "^7.27.0",
 		"glob": "^7.1.7",
 		"mocha": "^8.4.0",
-		"typescript": "^4.3.2",
-		"vscode-test": "^1.5.2"
+		"typescript": "^4.3.2"
 	},
 	"dependencies": {
 		"handlebars": "^4.7.7"

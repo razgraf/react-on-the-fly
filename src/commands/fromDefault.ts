@@ -27,7 +27,9 @@ function doWriteTemplate(stream: fs.WriteStream, name: string): void {
   stream.close();
 }
 
-async function create(context): Promise<string | undefined> {
+async function create(
+  context: vscode.Uri | undefined
+): Promise<string | undefined> {
   const dir = await getSelectedDirectory(context);
   if (!dir) {
     return;
