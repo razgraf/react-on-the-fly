@@ -54,7 +54,7 @@ function doWriteTemplate(stream: fs.WriteStream, name: string): void {
         return;
       }
     } else {
-      configurationDirectory = vscode.Uri.parse(
+      configurationDirectory = vscode.Uri.file(
         path.join(workspace.fsPath, `${constants.configuration.directory}`)
       );
     }
@@ -107,6 +107,7 @@ async function create(
   if (!dir) {
     return;
   }
+
   const name = await getDesiredName(dir.fsPath);
   if (dir && name) {
     const componentDirectory = doCreateDirectory(dir, name);

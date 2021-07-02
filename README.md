@@ -41,7 +41,7 @@ export default function MyComponent () {
 ## Reason
 I saw [this tweet](https://twitter.com/dan_abramov/status/1401284581291171843) by Dan Abramov @gaearon. Never built a VSCode extension so ... why not.
 
-Special thanks to some other devs for providing cool tooling around working with files or contextual data from vscode e.g. [(1)](https://github1s.com/fayras/vscode-simple-new-file/), [(2)](https://github1s.com/ElecTreeFrying/auto-import-relative-path).
+Special thanks to some other devs for providing cool tooling around working with files or contextual data from vscode e.g. [(1)](https://github.com/fayras/vscode-simple-new-file/), [(2)](https://github.com/ElecTreeFrying/auto-import-relative-path).
 ## Future features
 
 - Detection of missing react component and suggestion to create with `rotf`

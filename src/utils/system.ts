@@ -19,10 +19,10 @@ export function getNormalizedDirectory(source: string): vscode.Uri | undefined {
   if (exists) {
     const stat = fs.statSync(source);
     if (stat.isDirectory()) {
-      return vscode.Uri.parse(source);
+      return vscode.Uri.file(source);
     } else if (stat.isFile()) {
       const directory = path.dirname(source);
-      return vscode.Uri.parse(directory);
+      return vscode.Uri.file(directory);
     }
   }
   return undefined;
@@ -51,7 +51,7 @@ export function doCreateDirectory(
   }
 
   fs.mkdirSync(location);
-  return vscode.Uri.parse(location);
+  return vscode.Uri.file(location);
 }
 
 export function doCreateFile(
@@ -83,7 +83,7 @@ export function getActiveFileDirectory(): vscode.Uri | undefined {
   if (vscode.window.activeTextEditor) {
     const file = vscode.window.activeTextEditor.document.uri;
     const directory = path.dirname(file.fsPath);
-    return vscode.Uri.parse(directory);
+    return vscode.Uri.file(directory);
   }
 
   return undefined;

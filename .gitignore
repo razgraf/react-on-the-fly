@@ -94,7 +94,7 @@ dist
 # Serverless directories
 .serverless/
 
-# FuseBox cache
+# FuseBox cache5
 .fusebox/
 
 # DynamoDB Local files
@@ -102,3 +102,8 @@ dist
 
 # TernJS port file
 .tern-port
+
+### Specific to VSCODE Extensions
+react-on-the-fly-*.vsix
+out/
+!.vscode
